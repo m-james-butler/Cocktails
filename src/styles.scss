@@ -76,6 +76,11 @@ body {
   flex: 1 1 50%;
 }
 
+hr {
+  margin: 20px 0px;
+  border-top: 1px sold var(--lightgray);
+}
+
 // outils
 
 .p-10 {
@@ -170,8 +175,22 @@ body {
     }
     transition: background-color 0.4s;
   }
+  &-secondary {
+    background-color: var(--lightgray);
+  }
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .active {
   background-color: var(--secondary);
+}
+
+input {
+  border: 1px solid var(--lightgray);
+  border-radius: 3px;
+  padding: 8px 15px;
 }
