@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Cocktail } from 'src/shared/interfaces/cocktail.interface';
 import { CocktailService } from 'src/shared/services/cocktail.service';
 import { PanierService } from 'src/shared/services/panier.service';
@@ -9,29 +10,34 @@ import { PanierService } from 'src/shared/services/panier.service';
   templateUrl: './cocktail-details.component.html',
   styleUrls: ['./cocktail-details.component.scss'],
 })
-export class CocktailDetailsComponent implements OnInit {
-  public cocktail: Cocktail;
+export class CocktailDetailsComponent implements OnInit, OnDestroy {
+  public cocktail!: Cocktail;
+  public subscription!: Subscription;
 
   constructor(
     private panierService: PanierService,
     private cocktailService: CocktailService,
     private activatedRoute: ActivatedRoute
-  ) {
-    this.cocktail = this.cocktailService.getCocktail(
-      +this.activatedRoute.snapshot.paramMap.get('index')!
-    );
-  }
+  ) {}
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe((paramMap: ParamMap) => {
-      const cocktailIndex = paramMap.get('index');
-      if (cocktailIndex) {
-        this.cocktail = this.cocktailService.getCocktail(+cocktailIndex);
+      if (this.subscription) {
+        this.subscription.unsubscribe();
       }
+      this.subscription = this.cocktailService
+        .getCocktail(+paramMap.get('index')!)
+        .subscribe((cocktail: Cocktail) => {
+          this.cocktail = cocktail;
+        });
     });
   }
 
   public ajoutAuPanier() {
     this.panierService.addPanier(this.cocktail.ingredients);
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 }
